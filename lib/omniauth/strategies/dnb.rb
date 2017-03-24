@@ -4,13 +4,6 @@ require 'base64'
 module OmniAuth
   module Strategies
     class Dnb
-      class Form < OmniAuth::Form
-        protected
-
-        def css
-        end
-      end
-
       include OmniAuth::Strategy
 
       AUTH_SERVICE = '3001'
@@ -111,7 +104,7 @@ module OmniAuth
           return fail!(:private_key_load_err, e)
         end
 
-        form = Form.new(:title => I18n.t("omniauth.dnb.please_wait"), :url => options.site)
+        form = OmniAuth::Form.new(:title => I18n.t("omniauth.dnb.please_wait"), :url => options.site)
 
         {
           "VK_SERVICE" => AUTH_SERVICE,
