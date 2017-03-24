@@ -113,7 +113,7 @@ module OmniAuth
           "VK_SND_ID" => options.snd_id,
           "VK_STAMP" => stamp,
           "VK_RETURN" => callback_url,
-          "VK_MAC" => signature(priv_key)
+          "VK_MAC" => signature(priv_key),
           "VK_LANG" => "LAT",
         }.each do |name, val|
           form.html "<input type=\"hidden\" name=\"#{name}\" value=\"#{val}\" />"
