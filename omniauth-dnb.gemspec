@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Omniauth::Dnb::VERSION
   spec.authors       = ["MAK IT"]
   spec.email         = ["info@makit.lv"]
-  spec.description   = %q{OmniAuth strategy for DNB Banklink}
-  spec.summary       = %q{OmniAuth strategy for DNB Banklink}
+  spec.description   = %q{OmniAuth strategy for DNB Link}
+  spec.summary       = %q{OmniAuth strategy for DNB Link}
   spec.homepage      = ""
   spec.license       = "MIT"
 

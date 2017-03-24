@@ -4,13 +4,11 @@ require 'base64'
 module OmniAuth
   module Strategies
     class Dnb
-      # TODO add support for overriding the VK_LANG parameter
-
       include OmniAuth::Strategy
 
-      AUTH_SERVICE_ID = '3001'
-      AUTH_VERSION    = '101' # This value must not be used as a number, so as to not lose the padding
-                              # Padding is important when generating the VK_MAC value
+      AUTH_SERVICE = '3001'
+      AUTH_VERSION = '101'  # This value must not be used as a number, so as to not lose the padding
+                            # Padding is important when generating the VK_MAC value
 
       args [:private_key_file, :public_key_file, :snd_id]
 
@@ -38,7 +36,7 @@ module OmniAuth
 
       def signature_input
         [
-          AUTH_SERVICE_ID,              # VK_SERVICE
+          AUTH_SERVICE,                 # VK_SERVICE
           AUTH_VERSION,                 # VK_VERSION
           options.snd_id,               # VK_SND_ID
           stamp,                        # VK_STAMP
@@ -110,7 +108,7 @@ module OmniAuth
         form = OmniAuth::Form.new(:title => I18n.t("omniauth.dnb.please_wait"), :url => options.site)
 
         {
-          "VK_SERVICE" => AUTH_SERVICE_ID,
+          "VK_SERVICE" => AUTH_SERVICE,
           "VK_VERSION" => AUTH_VERSION,
           "VK_SND_ID" => options.snd_id,
           "VK_STAMP" => stamp,
