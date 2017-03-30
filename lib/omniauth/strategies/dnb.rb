@@ -104,7 +104,6 @@ module OmniAuth
           return fail!(:private_key_load_err, e)
         end
 
-        OmniAuth.config.form_css = nil
         form = OmniAuth::Form.new(:title => I18n.t("omniauth.dnb.please_wait"), :url => options.site)
 
         {

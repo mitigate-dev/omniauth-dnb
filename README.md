@@ -2,11 +2,6 @@
 
 Omniauth strategy for using DNB as an authentication service provider.
 
-Supported Ruby versions: 1.9.2, 1.9.3 and 2.0.0
-
-## Related projects
-
-
 ## Installation
 
 Add this line to your application's Gemfile:
