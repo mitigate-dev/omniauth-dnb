@@ -7,8 +7,7 @@ module OmniAuth
       include OmniAuth::Strategy
 
       AUTH_SERVICE = '3001'
-      AUTH_VERSION = '101'  # This value must not be used as a number, so as to not lose the padding
-                            # Padding is important when generating the VK_MAC value
+      AUTH_VERSION = '101'
 
       args [:private_key_file, :public_key_file, :snd_id]
 
@@ -21,13 +20,13 @@ module OmniAuth
 
       def stamp
         return @stamp if @stamp
-        @stamp = Time.now.strftime("%Y%m%d%H%M%S") + SecureRandom.random_number(99999).to_s.rjust(5, '0')
+        @stamp = Time.now.strftime('%Y%m%d%H%M%S') + SecureRandom.random_number(99999).to_s.rjust(5, '0')
 
       end
 
       def prepend_length(value)
         # prepend length to string in 0xx format
-        [ value.to_s.length.to_s.rjust(3, '0'), value.dup.to_s.force_encoding("ascii")].join
+        [ value.to_s.length.to_s.rjust(3, '0'), value.dup.to_s.force_encoding('ascii')].join
       end
 
       def signature_input
@@ -45,12 +44,25 @@ module OmniAuth
       end
 
       uid do
-        request.params["VK_PER_CODE"]
+        if request.params['VK_PER_CODE'].present?
+          request.params['VK_PER_CODE']
+        else
+          request.params['VK_COM_CODE']
+        end
       end
 
       info do
+        full_name = if request.params['VK_PER_FNAME'].present?
+          [request.params['VK_PER_FNAME'], request.params['VK_PER_LNAME']].join(' ')
+        else
+          request.params['VK_COM_NAME']
+        end
         {
-          full_name: [request.params["VK_PER_FNAME"], request.params["VK_PER_LNAME"]].join(" ")
+          full_name: full_name,
+          first_name: request.params['VK_PER_FNAME'],
+          last_name: request.params['VK_PER_LNAME'],
+          company_code: request.params['VK_COM_CODE'],
+          company_name: request.params['VK_COM_NAME'],
         }
       end
 
@@ -74,59 +86,55 @@ module OmniAuth
         end
 
         sig_str = [
-          request.params["VK_SERVICE"],
-          request.params["VK_VERSION"],
-          request.params["VK_SND_ID"],
-          request.params["VK_REC_ID"],
-          request.params["VK_STAMP"],
-          request.params["VK_T_NO"],
-          request.params["VK_PER_CODE"],
-          request.params["VK_PER_FNAME"],
-          request.params["VK_PER_LNAME"],
-          request.params["VK_COM_CODE"],
-          request.params["VK_COM_NAME"],
-          request.params["VK_TIME"]
+          request.params['VK_SERVICE'],
+          request.params['VK_VERSION'],
+          request.params['VK_SND_ID'],
+          request.params['VK_REC_ID'],
+          request.params['VK_STAMP'],
+          request.params['VK_T_NO'],
+          request.params['VK_PER_CODE'],
+          request.params['VK_PER_FNAME'],
+          request.params['VK_PER_LNAME'],
+          request.params['VK_COM_CODE'],
+          request.params['VK_COM_NAME'],
+          request.params['VK_TIME']
         ].map{|v| prepend_length(v)}.join
 
-        raw_signature = Base64.decode64(request.params["VK_MAC"])
+        raw_signature = Base64.decode64(request.params['VK_MAC'])
 
         if !pub_key.verify(OpenSSL::Digest::SHA1.new, raw_signature, sig_str)
           return fail!(:invalid_response_signature_err)
         end
 
         super
-      # rescue => e
-      #   fail!(:unknown_callback_err, e)
       end
 
       def request_phase
         begin
-          priv_key = OpenSSL::PKey::RSA.new(File.read(options.private_key_file || ""))
+          priv_key = OpenSSL::PKey::RSA.new(File.read(options.private_key_file || ''))
         rescue => e
           return fail!(:private_key_load_err, e)
         end
 
-        form = OmniAuth::Form.new(:title => I18n.t("omniauth.dnb.please_wait"), :url => options.site)
+        form = OmniAuth::Form.new(:title => I18n.t('omniauth.dnb.please_wait'), :url => options.site)
 
         {
-          "VK_SERVICE" => AUTH_SERVICE,
-          "VK_VERSION" => AUTH_VERSION,
-          "VK_SND_ID" => options.snd_id,
-          "VK_STAMP" => stamp,
-          "VK_RETURN" => callback_url,
-          "VK_MAC" => signature(priv_key),
-          "VK_LANG" => "LAT",
+          'VK_SERVICE' => AUTH_SERVICE,
+          'VK_VERSION' => AUTH_VERSION,
+          'VK_SND_ID' => options.snd_id,
+          'VK_STAMP' => stamp,
+          'VK_RETURN' => callback_url,
+          'VK_MAC' => signature(priv_key),
+          'VK_LANG' => 'LAT',
         }.each do |name, val|
           form.html "<input type=\"hidden\" name=\"#{name}\" value=\"#{val}\" />"
         end
 
-        form.button I18n.t("omniauth.dnb.click_here_if_not_redirected")
+        form.button I18n.t('omniauth.dnb.click_here_if_not_redirected')
 
-        form.instance_variable_set("@html",
-          form.to_html.gsub("</form>", "</form><script type=\"text/javascript\">document.forms[0].submit();</script>"))
+        form.instance_variable_set('@html',
+          form.to_html.gsub('</form>', '</form><script type="text/javascript">document.forms[0].submit();</script>'))
         form.to_response
-      # rescue => e
-      #   fail!(:unknown_request_err, e)
       end
     end
   end
