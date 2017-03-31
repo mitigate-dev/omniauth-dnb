@@ -19,18 +19,14 @@ module OmniAuth
       option :name, 'dnb'
       option :site, 'https://ib.dnb.lv/login/index.php'
 
-      def callback_url
-        full_host + script_name + callback_path
-      end
-
       def stamp
         return @stamp if @stamp
-        @stamp = ((full_host.gsub(/[\:\/]/, "X") + SecureRandom.uuid.gsub("-", "")).rjust 50, " ")[-50, 50]
+        @stamp = Time.now.strftime("%Y%m%d%H%M%S") + SecureRandom.random_number(99999).to_s.rjust(5, '0')
+
       end
 
       def prepend_length(value)
         # prepend length to string in 0xx format
-
         [ value.to_s.length.to_s.rjust(3, '0'), value.dup.to_s.force_encoding("ascii")].join
       end
 
@@ -49,13 +45,17 @@ module OmniAuth
       end
 
       uid do
-        request.params["VK_INFO"].match(/ISIK:(\d{6}\-\d{5})/)[1]
+        request.params["VK_PER_CODE"]
       end
 
       info do
         {
-          :full_name => request.params["VK_INFO"].match(/NIMI:(.+)/)[1]
+          full_name: [request.params["VK_PER_FNAME"], request.params["VK_PER_LNAME"]].join(" ")
         }
+      end
+
+      extra do
+        { raw_info: request.params }
       end
 
       def callback_phase
@@ -65,7 +65,7 @@ module OmniAuth
           return fail!(:public_key_load_err, e)
         end
 
-        if request.params['VK_SERVICE'] != '3001'
+        if request.params['VK_SERVICE'] != '2001'
           return fail!(:unsupported_response_service_err)
         end
 
@@ -73,18 +73,20 @@ module OmniAuth
           return fail!(:unsupported_response_version_err)
         end
 
-        if request.params['VK_ENCODING'] != 'UTF-8'
-          return fail!(:unsupported_response_encoding_err)
-        end
-
         sig_str = [
           request.params["VK_SERVICE"],
           request.params["VK_VERSION"],
           request.params["VK_SND_ID"],
+          request.params["VK_REC_ID"],
           request.params["VK_STAMP"],
-          request.params["VK_NONCE"],
-          request.params["VK_INFO"]
-        ].map(&:prepend_length).join
+          request.params["VK_T_NO"],
+          request.params["VK_PER_CODE"],
+          request.params["VK_PER_FNAME"],
+          request.params["VK_PER_LNAME"],
+          request.params["VK_COM_CODE"],
+          request.params["VK_COM_NAME"],
+          request.params["VK_TIME"]
+        ].map{|v| prepend_length(v)}.join
 
         raw_signature = Base64.decode64(request.params["VK_MAC"])
 
@@ -93,8 +95,8 @@ module OmniAuth
         end
 
         super
-      rescue => e
-        fail!(:unknown_callback_err, e)
+      # rescue => e
+      #   fail!(:unknown_callback_err, e)
       end
 
       def request_phase
@@ -123,8 +125,8 @@ module OmniAuth
         form.instance_variable_set("@html",
           form.to_html.gsub("</form>", "</form><script type=\"text/javascript\">document.forms[0].submit();</script>"))
         form.to_response
-      rescue => e
-        fail!(:unknown_request_err, e)
+      # rescue => e
+      #   fail!(:unknown_request_err, e)
       end
     end
   end
