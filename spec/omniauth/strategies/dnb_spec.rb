@@ -158,6 +158,7 @@ describe OmniAuth::Strategies::Dnb do
 
         expect(last_response.status).to eq(302)
         expect(last_response.headers['Location']).to eq('/auth/failure?message=invalid_response_signature_err&strategy=dnb')
+        expect(auth_hash).to be_nil
       end
 
       it 'detects unsupported VK_SERVICE values' do
@@ -179,6 +180,7 @@ describe OmniAuth::Strategies::Dnb do
 
         expect(last_response.status).to eq(302)
         expect(last_response.headers['Location']).to eq('/auth/failure?message=unsupported_response_service_err&strategy=dnb')
+        expect(auth_hash).to be_nil
       end
 
       it 'detects unsupported VK_VERSION values' do
@@ -200,6 +202,7 @@ describe OmniAuth::Strategies::Dnb do
 
         expect(last_response.status).to eq(302)
         expect(last_response.headers['Location']).to eq('/auth/failure?message=unsupported_response_version_err&strategy=dnb')
+        expect(auth_hash).to be_nil
       end
     end
   end
