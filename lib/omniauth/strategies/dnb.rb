@@ -112,6 +112,10 @@ module OmniAuth
       end
 
       def request_phase
+        puts '-----'
+        options.private_key
+        options.public_key
+        puts '--'
         begin
           priv_key = OpenSSL::PKey::RSA.new(options.private_key)
         rescue => e
