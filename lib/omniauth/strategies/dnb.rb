@@ -46,7 +46,7 @@ module OmniAuth
       end
 
       uid do
-        if request.params['VK_PER_CODE'].present?
+        if request.params['VK_PER_CODE']
           request.params['VK_PER_CODE']
         else
           request.params['VK_COM_CODE']
@@ -54,7 +54,7 @@ module OmniAuth
       end
 
       info do
-        full_name = if request.params['VK_PER_FNAME'].present?
+        full_name = if request.params['VK_PER_FNAME']
           [request.params['VK_PER_FNAME'], request.params['VK_PER_LNAME']].join(' ')
         else
           request.params['VK_COM_NAME']
