@@ -2,29 +2,21 @@ require 'spec_helper'
 
 describe OmniAuth::Strategies::Dnb do
 
-  PRIVATE_KEY_FILE = File.join RSpec.configuration.cert_folder, "request.private.pem"
-  PUBLIC_KEY_FILE = File.join RSpec.configuration.cert_folder, "response.public.pem"
+  PRIVATE_KEY_FILE = File.join RSpec.configuration.cert_folder, 'Diablo_cert_priv_key.pem'
+  PUBLIC_KEY_FILE = File.join RSpec.configuration.cert_folder, 'DNB_X509_for_ext_system_and_merchant_10028.crt'
 
   let(:app){ Rack::Builder.new do |b|
-    b.use Rack::Session::Cookie, {:secret => "abc123"}
-    b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY_FILE, PUBLIC_KEY_FILE, "MY_SND_ID", "MY_REC_ID")
+    b.use Rack::Session::Cookie, { secret: 'abc123'}
+    b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY_FILE, PUBLIC_KEY_FILE, 'MY_SND_ID')
     b.run lambda{|env| [404, {}, ['Not Found']]}
   end.to_app }
 
   let(:private_key) { OpenSSL::PKey::RSA.new(File.read(PRIVATE_KEY_FILE)) }
-  let(:public_key) { OpenSSL::PKey::RSA.new(File.read(PUBLIC_KEY_FILE)) }
-  let(:last_response_nonce) { last_response.body.match(/name="VK_NONCE" value="([^"]*)"/)[1] }
-  let(:last_response_mac) { last_response.body.match(/name="VK_MAC" value="([^"]*)"/)[1] }
+  let(:public_key)  { OpenSSL::PKey::RSA.new(File.read(PUBLIC_KEY_FILE)) }
+  let(:last_response_stamp) { last_response.body.match(/name="VK_STAMP" value="([^"]*)"/)[1] }
+  let(:last_response_mac)   { last_response.body.match(/name="VK_MAC" value="([^"]*)"/)[1] }
 
-  context "request phase" do
-    EXPECTED_VALUES = {
-      "VK_SERVICE" => "4002",
-      "VK_VERSION" => "008",
-      "VK_SND_ID" =>  "MY_SND_ID",
-      "VK_REC_ID" =>  "MY_REC_ID",
-      "VK_RETURN" =>  "http://example.org/auth/dnb/callback"
-    }
-
+  context 'request phase' do
     before(:each){ get '/auth/dnb' }
 
     it "displays a single form" do
@@ -36,25 +28,30 @@ describe OmniAuth::Strategies::Dnb do
       expect(last_response.body).to be_include("</form><script type=\"text/javascript\">document.forms[0].submit();</script>")
     end
 
+    EXPECTED_VALUES = {
+      VK_SERVICE: '3001',
+      VK_VERSION: '101',
+      VK_SND_ID:  'MY_SND_ID',
+      VK_RETURN:  'http://example.org/auth/dnb/callback'
+    }
+
     EXPECTED_VALUES.each_pair do |k,v|
       it "has hidden input field #{k} => #{v}" do
-        expect(last_response.body.scan(
-          "<input type=\"hidden\" name=\"#{k}\" value=\"#{v}\"").size).to eq(1)
+        expect(last_response.body.scan("<input type=\"hidden\" name=\"#{k}\" value=\"#{v}\"").size).to eq(1)
       end
     end
 
-    it "has a 50 byte long nonce field value" do
-      expect(last_response_nonce.bytesize).to eq(50)
+    it "has a VK_STAMP hidden field with 20 byte long value" do
+      expect(last_response_stamp.bytesize).to eq(20)
     end
 
     it "has a correct VK_MAC signature" do
       sig_str =
-        "0044002" + # VK_SERVICE
-        "003008" +  # VK_VERSION
-        "009MY_SND_ID" +  # VK_SND_ID
-        "009MY_REC_ID" +  # VK_REC_ID
-        "050" + last_response_nonce +  # VK_NONCE
-        "041#{EXPECTED_VALUES["VK_RETURN"]}"  # V_RETURN
+        "004#{EXPECTED_VALUES[:VK_SERVICE]}" +
+        "003#{EXPECTED_VALUES[:VK_VERSION]}" +
+        "009#{EXPECTED_VALUES[:VK_SND_ID]}" +
+        "020" + last_response_stamp +  # VK_STAMP
+        "036#{EXPECTED_VALUES[:VK_RETURN]}"
 
       expected_mac = Base64.encode64(private_key.sign(OpenSSL::Digest::SHA1.new, sig_str))
       expect(last_response_mac).to eq(expected_mac)
@@ -62,19 +59,19 @@ describe OmniAuth::Strategies::Dnb do
 
     context "with default options" do
       it "has the default action tag value" do
-        expect(last_response.body).to be_include("action='https://ib.dnb.lv/login/index.php'")
+        expect(last_response.body).to be_include("action='#{OmniAuth::Strategies::Dnb::PRODUCTION_ENDPOINT}'")
       end
 
       it "has the default VK_LANG value" do
-        expect(last_response.body).to be_include("action='https://ib.dnb.lv/login/index.php'")
+        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="LAT"').size).to eq(1)
       end
     end
 
     context "with custom options" do
       let(:app){ Rack::Builder.new do |b|
-        b.use Rack::Session::Cookie, {:secret => "abc123"}
-        b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY_FILE, PUBLIC_KEY_FILE, "MY_SND_ID", "MY_REC_ID",
-          :site => "https://test.lv/banklink")
+        b.use Rack::Session::Cookie, { secret: 'abc123' }
+        b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY_FILE, PUBLIC_KEY_FILE, 'MY_SND_ID',
+          site: "https://test.lv/banklink")
         b.run lambda{|env| [404, {}, ['Not Found']]}
       end.to_app }
 
@@ -85,8 +82,8 @@ describe OmniAuth::Strategies::Dnb do
 
     context "with non-existant private key files" do
       let(:app){ Rack::Builder.new do |b|
-        b.use Rack::Session::Cookie, {:secret => "abc123"}
-        b.use(OmniAuth::Strategies::Dnb, "missing-private-key-file.pem", PUBLIC_KEY_FILE, "MY_SND_ID", "MY_REC_ID")
+        b.use Rack::Session::Cookie, { secret: 'abc123' }
+        b.use(OmniAuth::Strategies::Dnb, "missing-private-key-file.pem", PUBLIC_KEY_FILE, 'MY_SND_ID')
         b.run lambda{|env| [404, {}, ['Not Found']]}
       end.to_app }
 

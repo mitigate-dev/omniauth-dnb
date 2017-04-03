@@ -19,12 +19,11 @@ module OmniAuth
       option :snd_id, nil
 
       option :name, 'dnb'
-      option :site, 'https://ib.dnb.lv/login/index.php'
+      option :site, PRODUCTION_ENDPOINT
 
       def stamp
         return @stamp if @stamp
-        @stamp = Time.now.strftime('%Y%m%d%H%M%S') + SecureRandom.random_number(99999).to_s.rjust(5, '0')
-
+        @stamp = Time.now.strftime('%Y%m%d%H%M%S') + SecureRandom.random_number(999999).to_s.rjust(6, '0')
       end
 
       def prepend_length(value)
