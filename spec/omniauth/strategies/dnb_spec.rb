@@ -25,7 +25,7 @@ describe OmniAuth::Strategies::Dnb do
     end
 
     it 'has JavaScript code to submit the form after it is created' do
-      expect(last_response.body).to be_include("</form><script type=\"text/javascript\">document.forms[0].submit();</script>")
+      expect(last_response.body).to be_include('</form><script type="text/javascript">document.forms[0].submit();</script>')
     end
 
     EXPECTED_VALUES = {
