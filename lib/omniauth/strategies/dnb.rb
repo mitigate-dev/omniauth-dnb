@@ -74,9 +74,6 @@ module OmniAuth
 
       def callback_phase
         begin
-          puts '-- callback_phase --'
-          puts "-#{File.read(Rails.root.join('config/certs/dnb/bank.crt'))}-"
-          puts "-#{options.public_key}-"
           pub_key = OpenSSL::X509::Certificate.new(options.public_key).public_key
         rescue => e
           return fail!(:public_key_load_err, e)
@@ -116,9 +113,6 @@ module OmniAuth
 
       def request_phase
         begin
-          puts '-- request_phase --'
-          puts "-#{File.read(Rails.root.join('config/certs/dnb/private.key'))}-"
-          puts "-#{options.private_key}-"
           priv_key = OpenSSL::PKey::RSA.new(options.private_key)
         rescue => e
           return fail!(:private_key_load_err, e)
