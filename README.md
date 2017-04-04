@@ -24,8 +24,8 @@ in `config/initializers/omniauth.rb`:
 ```ruby
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :dnb,
-    "-----BEGIN PRIVATE KEY-----\n#{ENV['DNB_PRIVATE_KEY']}-----END PRIVATE KEY-----\n",
-    "-----BEGIN CERTIFICATE-----\n#{ENV['DNB_PUBLIC_KEY']}-----END CERTIFICATE-----\n",
+    "-----BEGIN PRIVATE KEY-----\n#{ENV['DNB_PRIVATE_KEY']}\n-----END PRIVATE KEY-----\n",
+    "-----BEGIN CERTIFICATE-----\n#{ENV['DNB_PUBLIC_KEY']}\n-----END CERTIFICATE-----\n",
     ENV['DNB_SND_ID'], site: ENV['DNB_SITE'] || OmniAuth::Strategies::Dnb::PRODUCTION_ENDPOINT
 end
 ```
