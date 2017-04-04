@@ -74,7 +74,7 @@ module OmniAuth
 
       def callback_phase
         begin
-          pub_key = OpenSSL::X509::Certificate.new(options.public_key).public_key
+          pub_key = OpenSSL::X509::Certificate.new(File.read(Rails.root.join('config/certs/dnb/bank.crt'))).public_key
         rescue => e
           return fail!(:public_key_load_err, e)
         end
@@ -113,7 +113,7 @@ module OmniAuth
 
       def request_phase
         begin
-          priv_key = OpenSSL::PKey::RSA.new(options.private_key)
+          priv_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config/certs/dnb/private.key')))
         rescue => e
           return fail!(:private_key_load_err, e)
         end
