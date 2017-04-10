@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['admin@makit.lv']
   spec.description   = %q{OmniAuth strategy for DNB Link}
   spec.summary       = %q{OmniAuth strategy for DNB Link}
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/mak-it/omniauth-dnb'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
