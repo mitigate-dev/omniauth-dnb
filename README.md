@@ -1,8 +1,8 @@
-# Omniauth DNB
+# OmniAuth DNB
 
 [![Build Status](https://travis-ci.org/mak-it/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mak-it/omniauth-dnb)
 
-Omniauth strategy for using DNB as an authentication service provider.
+Omniauth strategy for using [DNB Link](https://www.dnb.lv/en/business/acceptance-payments-and-customer-authentication-online-dnb-link) as an authentication service provider.
 
 ## Installation
 
