@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'omniauth-dnb'
   spec.version       = Omniauth::Dnb::VERSION
   spec.authors       = ['MAK IT']
-  spec.email         = ['info@makit.lv']
+  spec.email         = ['admin@makit.lv']
   spec.description   = %q{OmniAuth strategy for DNB Link}
   spec.summary       = %q{OmniAuth strategy for DNB Link}
   spec.homepage      = ''
