@@ -1,4 +1,6 @@
-# Omniauth::DNB
+# Omniauth DNB
+
+[![Build Status](https://travis-ci.org/mak-it/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mak-it/omniauth-dnb)
 
 Omniauth strategy for using DNB as an authentication service provider.
 
