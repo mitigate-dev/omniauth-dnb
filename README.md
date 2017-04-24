@@ -1,8 +1,15 @@
 # OmniAuth DNB
 
+Omniauth strategy for using [DNB Link](https://www.dnb.lv/en/business/acceptance-payments-and-customer-authentication-online-dnb-link) as an authentication service provider.
+
 [![Build Status](https://travis-ci.org/mak-it/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mak-it/omniauth-dnb)
 
-Omniauth strategy for using [DNB Link](https://www.dnb.lv/en/business/acceptance-payments-and-customer-authentication-online-dnb-link) as an authentication service provider.
+Supported Ruby versions: 2.2+
+
+## Related projects
+
+- [omniauth-nordea](https://github.com/mak-it/omniauth-nordea) - strategy for authenticating with Nordea
+- [omniauth-swedbank](https://github.com/mak-it/omniauth-swedbank) - strategy for authenticating with Swedbank
 
 ## Installation
 
