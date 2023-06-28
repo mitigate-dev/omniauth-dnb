@@ -2,16 +2,16 @@
 
 Omniauth strategy for using [DNB Link](https://www.dnb.lv/en/business/acceptance-payments-and-customer-authentication-online-dnb-link) as an authentication service provider.
 
-[![Build Status](https://travis-ci.org/mak-it/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mak-it/omniauth-dnb)
+[![Build Status](https://travis-ci.org/mitigate-dev/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mitigate-dev/omniauth-dnb)
 
 Supported Ruby versions: 2.2+
 
 ## Related projects
 
-- [omniauth-citadele](https://github.com/mak-it/omniauth-citadele) - strategy for authenticating with Citadele
-- [omniauth-nordea](https://github.com/mak-it/omniauth-nordea) - strategy for authenticating with Nordea
-- [omniauth-seb-elink](https://github.com/mak-it/omniauth-seb-elink) - strategy for authenticating with SEB
-- [omniauth-swedbank](https://github.com/mak-it/omniauth-swedbank) - strategy for authenticating with Swedbank
+- [omniauth-citadele](https://github.com/mitigate-dev/omniauth-citadele) - strategy for authenticating with Citadele
+- [omniauth-nordea](https://github.com/mitigate-dev/omniauth-nordea) - strategy for authenticating with Nordea
+- [omniauth-seb-elink](https://github.com/mitigate-dev/omniauth-seb-elink) - strategy for authenticating with SEB
+- [omniauth-swedbank](https://github.com/mitigate-dev/omniauth-swedbank) - strategy for authenticating with Swedbank
 
 ## Installation
 

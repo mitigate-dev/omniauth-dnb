@@ -5,11 +5,11 @@ require 'omniauth/dnb/version'
 Gem::Specification.new do |spec|
   spec.name          = 'omniauth-dnb'
   spec.version       = Omniauth::Dnb::VERSION
-  spec.authors       = ['MAK IT']
-  spec.email         = ['admin@makit.lv']
+  spec.authors       = ['Mitigate']
+  spec.email         = ['admin@mitigate.dev']
   spec.description   = %q{OmniAuth strategy for DNB Link}
   spec.summary       = %q{OmniAuth strategy for DNB Link}
-  spec.homepage      = 'https://github.com/mak-it/omniauth-dnb'
+  spec.homepage      = 'https://github.com/mitigate-dev/omniauth-dnb'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
