@@ -61,7 +61,7 @@ describe OmniAuth::Strategies::Dnb do
       end
 
       it 'has the default VK_LANG value' do
-        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="LAT"').size).to eq(1)
+        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="ENG"').size).to eq(1)
       end
     end
 

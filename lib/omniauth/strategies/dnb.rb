@@ -126,6 +126,8 @@ module OmniAuth
           return fail!(:private_key_load_err, e)
         end
 
+        set_locale_from_query_param
+
         form = OmniAuth::Form.new(:title => I18n.t('omniauth.dnb.please_wait'), :url => options.site)
 
         {
@@ -135,7 +137,7 @@ module OmniAuth
           'VK_STAMP' => stamp,
           'VK_RETURN' => callback_url,
           'VK_MAC' => signature(priv_key),
-          'VK_LANG' => 'LAT',
+          'VK_LANG' => resolve_bank_ui_language,
         }.each do |name, val|
           form.html "<input type=\"hidden\" name=\"#{name}\" value=\"#{val}\" />"
         end
@@ -153,6 +155,21 @@ module OmniAuth
       end
 
       private
+
+      def set_locale_from_query_param
+        locale = request.params['locale']
+        if (locale != nil && locale.strip != '' && I18n.locale_available?(locale))
+          I18n.locale = locale
+        end
+      end
+
+      def resolve_bank_ui_language
+        case I18n.locale
+        when :ru then 'RUS'
+        when :en then 'ENG'
+        else 'LAT'
+        end
+      end
 
       def escape(html_attribute_value)
          CGI.escapeHTML(html_attribute_value) unless html_attribute_value.nil?
