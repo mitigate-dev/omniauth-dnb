@@ -1,6 +1,6 @@
 # OmniAuth DNB
 
-Omniauth strategy for using [DNB Link](https://www.dnb.lv/en/business/acceptance-payments-and-customer-authentication-online-dnb-link) as an authentication service provider.
+Omniauth strategy for using [Luminor Link](https://www.luminor.lv/en/terms-conditions#luminor-link) as an authentication service provider.
 
 [![Build Status](https://travis-ci.org/mitigate-dev/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mitigate-dev/omniauth-dnb)
 
@@ -15,8 +15,9 @@ Supported Ruby versions: 2.2+
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application's Gemfile (omniauth-rails_csrf_protection is required if using Rails):
 
+    gem 'omniauth-rails_csrf_protection'
     gem 'omniauth-dnb'
 
 And then execute:
@@ -25,7 +26,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install omniauth-dnb
+    $ gem install omniauth-rails_csrf_protection omniauth-dnb
 
 ## Usage
 
