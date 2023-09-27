@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rack-protection'
 
 describe OmniAuth::Strategies::Dnb do
 
@@ -10,11 +11,19 @@ describe OmniAuth::Strategies::Dnb do
     b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY, PUBLIC_KEY, 'MY_SND_ID')
     b.run lambda{|env| [404, {}, ['Not Found']]}
   end.to_app }
+  let(:token){ Rack::Protection::AuthenticityToken.random_token }
   let(:last_response_stamp) { last_response.body.match(/name="VK_STAMP" value="([^"]*)"/)[1] }
   let(:last_response_mac)   { last_response.body.match(/name="VK_MAC" value="([^"]*)"/)[1] }
 
   context 'request phase' do
-    before(:each){ get '/auth/dnb' }
+    before(:each) do
+      post(
+        '/auth/dnb',
+        {},
+        'rack.session' => {csrf: token},
+        'HTTP_X_CSRF_TOKEN' => token
+      )
+    end
 
     it 'displays a single form' do
       expect(last_response.status).to eq(200)
@@ -61,7 +70,7 @@ describe OmniAuth::Strategies::Dnb do
       end
 
       it 'has the default VK_LANG value' do
-        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="LAT"').size).to eq(1)
+        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="ENG"').size).to eq(1)
       end
     end
 
