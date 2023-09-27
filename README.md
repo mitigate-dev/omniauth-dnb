@@ -2,9 +2,7 @@
 
 Omniauth strategy for using [Luminor Link](https://www.luminor.lv/en/terms-conditions#luminor-link) as an authentication service provider.
 
-[![Build Status](https://travis-ci.org/mitigate-dev/omniauth-dnb.svg?branch=master)](https://travis-ci.org/mitigate-dev/omniauth-dnb)
-
-Supported Ruby versions: 2.2+
+Supported Ruby versions: 2.7+
 
 ## Related projects
 
