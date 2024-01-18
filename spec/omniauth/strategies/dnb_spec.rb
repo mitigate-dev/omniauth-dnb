@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'rack-protection'
+require 'rack/session'
 
 describe OmniAuth::Strategies::Dnb do
 
@@ -6,15 +8,23 @@ describe OmniAuth::Strategies::Dnb do
   PUBLIC_KEY = File.read(File.join(RSpec.configuration.cert_folder, 'bank.crt'))
 
   let(:app){ Rack::Builder.new do |b|
-    b.use Rack::Session::Cookie, { secret: 'abc123'}
+    b.use Rack::Session::Cookie, { secret: '5242e6bd9daf0e9645c2d4e22b11ba8cee0bed44439906d5f1bd5dad409d8637'}
     b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY, PUBLIC_KEY, 'MY_SND_ID')
     b.run lambda{|env| [404, {}, ['Not Found']]}
   end.to_app }
+  let(:token){ Rack::Protection::AuthenticityToken.random_token }
   let(:last_response_stamp) { last_response.body.match(/name="VK_STAMP" value="([^"]*)"/)[1] }
   let(:last_response_mac)   { last_response.body.match(/name="VK_MAC" value="([^"]*)"/)[1] }
 
   context 'request phase' do
-    before(:each){ get '/auth/dnb' }
+    before(:each) do
+      post(
+        '/auth/dnb',
+        {},
+        'rack.session' => {csrf: token},
+        'HTTP_X_CSRF_TOKEN' => token
+      )
+    end
 
     it 'displays a single form' do
       expect(last_response.status).to eq(200)
@@ -61,13 +71,13 @@ describe OmniAuth::Strategies::Dnb do
       end
 
       it 'has the default VK_LANG value' do
-        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="LAT"').size).to eq(1)
+        expect(last_response.body.scan('<input type="hidden" name="VK_LANG" value="ENG"').size).to eq(1)
       end
     end
 
     context 'with custom options' do
       let(:app){ Rack::Builder.new do |b|
-        b.use Rack::Session::Cookie, { secret: 'abc123' }
+        b.use Rack::Session::Cookie, { secret: '5242e6bd9daf0e9645c2d4e22b11ba8cee0bed44439906d5f1bd5dad409d8637' }
         b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY, PUBLIC_KEY, 'MY_SND_ID',
           site: 'https://test.lv/banklink')
         b.run lambda{|env| [404, {}, ['Not Found']]}
@@ -80,7 +90,7 @@ describe OmniAuth::Strategies::Dnb do
 
     context 'with non-existant private key files' do
       let(:app){ Rack::Builder.new do |b|
-        b.use Rack::Session::Cookie, { secret: 'abc123' }
+        b.use Rack::Session::Cookie, { secret: '5242e6bd9daf0e9645c2d4e22b11ba8cee0bed44439906d5f1bd5dad409d8637' }
         b.use(OmniAuth::Strategies::Dnb, 'invalid_key', PUBLIC_KEY, 'MY_SND_ID')
         b.run lambda{|env| [404, {}, ['Not Found']]}
       end.to_app }
@@ -124,7 +134,7 @@ describe OmniAuth::Strategies::Dnb do
 
     context 'with non-existant public key file' do
       let(:app){ Rack::Builder.new do |b|
-        b.use Rack::Session::Cookie, { secret: 'abc123' }
+        b.use Rack::Session::Cookie, { secret: '5242e6bd9daf0e9645c2d4e22b11ba8cee0bed44439906d5f1bd5dad409d8637' }
         b.use(OmniAuth::Strategies::Dnb, PRIVATE_KEY, 'invalid_crt', 'MY_SND_ID')
         b.run lambda{|env| [404, {}, ['Not Found']]}
       end.to_app }
