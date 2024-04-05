@@ -6,7 +6,7 @@ module OmniAuth
     class Dnb
       include OmniAuth::Strategy
 
-      PRODUCTION_ENDPOINT = 'https://ib.dnb.lv/login/index.php'
+      PRODUCTION_ENDPOINT = 'https://ib.luminor.lv/login/rid_login.php'
       TEST_ENDPOINT = 'https://link.securet.dnb.lv/login/rid_login.php'
 
       AUTH_SERVICE = '3001'
